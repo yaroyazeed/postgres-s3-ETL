@@ -52,8 +52,6 @@ with DAG(
             )
 
         try:
-            print(bucket_file)
-
             file_df = pd.read_csv(bucket_file['Body'])
             file = file_df.to_csv(s_buf, index=False)
             s_buf.seek(0)
@@ -73,6 +71,25 @@ with DAG(
     # [START transform_function]
     def transform(**kwargs):
         try:
+            cur.execute("""
+                CREATE TABLE IF NOT EXISTS yazejibi6672_analytics.agg_public_holiday(
+                    ingestion_date      DATE PRIMARY KEY NOT NULL,
+                    tt_order_hol_jan    INT         NOT NULL,
+                    tt_order_hol_feb    INT         NOT NULL,
+                    tt_order_hol_mar    INT         NOT NULL,
+                    tt_order_hol_apr    INT         NOT NULL,
+                    tt_order_hol_may    INT         NOT NULL,
+                    tt_order_hol_jun    INT         NOT NULL,
+                    tt_order_hol_jul    INT         NOT NULL,
+                    tt_order_hol_aug    INT         NOT NULL,
+                    tt_order_hol_sep    INT         NOT NULL,
+                    tt_order_hol_oct    INT         NOT NULL,
+                    tt_order_hol_nov    INT         NOT NULL,
+                    tt_order_hol_dec    INT         NOT NULL
+                    )
+                """)
+            conn.commit()
+
             cur.execute("""
                 WITH CTE_1 AS (
                     Select a.*,
@@ -127,7 +144,7 @@ with DAG(
 
             print("File best_performing_product.csv exported successfully!")
         except Exception as e:
-            print("Database connection failed due to {}".format(e))                
+            print("Database connection failed due to {}".format(e))        
     # [END load_function]
 
 
