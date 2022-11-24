@@ -1,0 +1,7 @@
+boto3
+psycopg2
+sys
+os
+botocore
+botocore.client
+pandas
