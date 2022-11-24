@@ -1,5 +1,5 @@
 .DS_Store
-/airflow/.DS_Store
-/airflow/logs/data_processor_manager/
-/airflow/logs/scheduler/
-/airflow/logs/.DS_Store
+airflow/.DS_Store
+airflow/logs/data_processor_manager/
+airflow/logs/scheduler/
+airflow/logs/.DS_Store
