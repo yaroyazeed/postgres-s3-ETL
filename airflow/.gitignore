@@ -2,4 +2,6 @@
 airflow/.DS_Store
 airflow/logs/data_processor_manager/
 airflow/logs/scheduler/
+airflow/dags/__pycache__/
+airflow/dags/.DS_Store
 airflow/logs/.DS_Store
