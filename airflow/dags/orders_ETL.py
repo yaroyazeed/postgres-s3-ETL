@@ -34,8 +34,8 @@ with DAG(
     'orders_ETL',
     default_args={'retries': 2},
     description='ETL DAG for orders',
-    schedule_interval=None,
-    start_date=pendulum.datetime(2021, 1, 1, tz="UTC"),
+    schedule_interval='@once',
+    start_date=pendulum.datetime(2022, 11, 22, tz="UTC"),
     catchup=False,
     tags=['example'],
 ) as dag:
