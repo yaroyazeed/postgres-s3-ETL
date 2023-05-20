@@ -7,6 +7,8 @@ This is an ETL pipeline that
 
 This pipeline was orchestrated using airflow to run once. `Docker-compose.yaml`, `Dockerfile` and `requirements.txt` files have been added to help replicating this pipeline easier.
 
+More detailed information about what the pipeline is to do can be found in the [Task.pdf file](https://github.com/yaroyazeed/postgres-s3-ETL/blob/master/TASK.pdf)
+
 ### Extract Transform Load
 This involves
 1. Running the `create_tables.py` script in the `scripts` folder to create the tables for raw data to be loaded into.
