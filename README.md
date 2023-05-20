@@ -1,5 +1,5 @@
 ## About this project
-This is an ETL pipeline orchestrated using airflow to run once. `Docker-compose.yaml`, `Dockerfile` and `requirements.txt` files have been added to help replicating this application easier.
+This is an ETL pipeline orchestrated using airflow to run once. `Docker-compose.yaml`, `Dockerfile` and `requirements.txt` files have been added to help replicating this pipeline easier.
 
 ### Extract Transform Load
 This involves
