@@ -16,17 +16,17 @@ from botocore.client import Config
 import pandas as pd
 import io
 
-ENDPOINT="d2b-internal-assessment-dwh.cxeuj0ektqdz.eu-central-1.rds.amazonaws.com"
+HOST="34.89.230.185"
 PORT="5432"
-USER="yazejibi6672"
+USER="yazejibi2622"
 REGION="eu-central-1"
-DBNAME="d2b_assessment"
-PASSWORD="3aXYi4XPVw"
+DBNAME="d2b_accessment"
+PASSWORD="wUrwdz3sDa"
 REGION_NAME="eu-central-1"
 BUCKET="d2b-internal-assessment-bucket"
 KEY="orders_data/orders.csv"
 
-conn = psycopg2.connect(host=ENDPOINT, port=PORT, database=DBNAME, user=USER, password=PASSWORD, sslrootcert="SSLCERTIFICATE")
+conn = psycopg2.connect(host=HOST, port=PORT, database=DBNAME, user=USER, password=PASSWORD, sslrootcert="SSLCERTIFICATE")
 cur = conn.cursor()
 
 
@@ -57,7 +57,7 @@ with DAG(
             s_buf.seek(0)
 
             cur.copy_expert("""
-                COPY yazejibi6672_staging.orders FROM STDIN WITH CSV HEADER DELIMITER AS ','
+                COPY yazejibi2622_staging.orders FROM STDIN WITH CSV HEADER DELIMITER AS ','
                 """, s_buf)
 
             print("Table ORDERS populated successfully")
@@ -72,7 +72,7 @@ with DAG(
     def transform(**kwargs):
         try:
             cur.execute("""
-                CREATE TABLE IF NOT EXISTS yazejibi6672_analytics.agg_public_holiday(
+                CREATE TABLE IF NOT EXISTS yazejibi2622_analytics.agg_public_holiday(
                     ingestion_date      DATE PRIMARY KEY NOT NULL,
                     tt_order_hol_jan    INT         NOT NULL,
                     tt_order_hol_feb    INT         NOT NULL,
@@ -95,7 +95,7 @@ with DAG(
                     Select a.*,
                     b.* 
                     FROM 
-                    yazejibi6672_staging.orders a
+                    yazejibi2622_staging.orders a
                     JOIN if_common.dim_dates b ON a.order_date = b.calendar_dt
                     ),
                 CTE_2 AS (
@@ -121,7 +121,7 @@ with DAG(
                     CTE_2            
                     )
 
-                INSERT INTO yazejibi6672_analytics.agg_public_holiday SELECT * FROM CTE_3
+                INSERT INTO yazejibi2622_analytics.agg_public_holiday SELECT * FROM CTE_3
                 """)
 
             print("Table agg_public_holiday transformed and created successfully")
@@ -135,12 +135,12 @@ with DAG(
     # [START load_function]
     def load(**kwargs):
         resource=boto3.resource('s3',config=Config(signature_version=UNSIGNED),region_name='eu-central-1')
-        s_buf = io.StringIO()
+        file = io.StringIO()
         try:
             cur.copy_expert("""
-                COPY yazejibi6672_analytics.agg_public_holiday TO STDIN WITH (FORMAT CSV, HEADER, DELIMITER ',')
+                COPY yazejibi2622_analytics.agg_public_holiday TO STDIN WITH (FORMAT CSV, HEADER, DELIMITER ',')
                 """, file)
-            resource.Object(bucket, 'analytics_export/yazejibi6672/agg_public_holiday.csv').put(Body=file.getvalue())
+            resource.Object(BUCKET, 'analytics_export/yazejibi2622/agg_public_holiday.csv').put(Body=file.getvalue())
 
             print("File best_performing_product.csv exported successfully!")
         except Exception as e:

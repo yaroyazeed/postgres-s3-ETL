@@ -16,17 +16,17 @@ from botocore.client import Config
 import pandas as pd
 import io
 
-ENDPOINT="d2b-internal-assessment-dwh.cxeuj0ektqdz.eu-central-1.rds.amazonaws.com"
+HOST="34.89.230.185"
 PORT="5432"
-USER="yazejibi6672"
+USER="yazejibi2622"
 REGION="eu-central-1"
-DBNAME="d2b_assessment"
-PASSWORD="3aXYi4XPVw"
+DBNAME="d2b_accessment"
+PASSWORD="wUrwdz3sDa"
 REGION_NAME="eu-central-1"
 BUCKET="d2b-internal-assessment-bucket"
 KEY="orders_data/reviews.csv"
 
-conn = psycopg2.connect(host=ENDPOINT, port=PORT, database=DBNAME, user=USER, password=PASSWORD, sslrootcert="SSLCERTIFICATE")
+conn = psycopg2.connect(host=HOST, port=PORT, database=DBNAME, user=USER, password=PASSWORD, sslrootcert="SSLCERTIFICATE")
 cur = conn.cursor()
 
 
@@ -52,14 +52,12 @@ with DAG(
             )
 
         try:
-            print(bucket_file)
-
             file_df = pd.read_csv(bucket_file['Body'])
             file = file_df.to_csv(s_buf, index=False)
             s_buf.seek(0)
 
             cur.copy_expert("""
-                COPY yazejibi6672_staging.reviews FROM STDIN WITH CSV HEADER DELIMITER AS ','
+                COPY yazejibi2622_staging.reviews FROM STDIN WITH CSV HEADER DELIMITER AS ','
                 """, s_buf)
 
             print("Table REVIEWS populated successfully")
@@ -74,7 +72,7 @@ with DAG(
     def transform(**kwargs):
         try:
             cur.execute(""" 
-                CREATE TABLE IF NOT EXISTS yazejibi6672_analytics.best_performing_product(
+                CREATE TABLE IF NOT EXISTS yazejibi2622_analytics.best_performing_product(
                     ingestion_date          DATE    PRIMARY KEY       NOT NULL,
                     product_name            VARCHAR                   NOT NULL,
                     most_ordered_day        DATE                      NOT NULL,
@@ -90,7 +88,7 @@ with DAG(
                     );
 
                 """)
-            cur.commit()
+            conn.commit()
 
             cur.execute("""
                 WITH CTE_1 AS (
@@ -108,11 +106,11 @@ with DAG(
                 e.shipment_date,
                 e.delivery_date
                 FROM 
-                yazejibi6672_staging.reviews a
+                yazejibi2622_staging.reviews a
                 JOIN if_common.dim_products b ON a.product_id = b.product_id
-                JOIN yazejibi6672_staging.orders c ON b.product_id = c.product_id::INT
+                JOIN yazejibi2622_staging.orders c ON b.product_id = c.product_id::INT
                 JOIN if_common.dim_dates d ON c.order_date = d.calendar_dt
-                JOIN yazejibi6672_staging.shipment_deliveries e ON c.order_id = e.order_id
+                JOIN yazejibi2622_staging.shipments_deliveries e ON c.order_id = e.order_id
                 ),
 
                 CTE_2 AS(
@@ -196,7 +194,7 @@ with DAG(
                 )
 
               
-                INSERT INTO yazejibi6672_analytics.best_performing_product SELECT * FROM CTE_FINAL
+                INSERT INTO yazejibi2622_analytics.best_performing_product SELECT * FROM CTE_FINAL
                 """)
 
             print("Table best_performing_product transformed and created successfully")
@@ -210,12 +208,12 @@ with DAG(
     # [START load_function]
     def load(**kwargs):
         resource=boto3.resource('s3',config=Config(signature_version=UNSIGNED),region_name='eu-central-1')
-        s_buf = io.StringIO()
+        file = io.StringIO()
         try:
             cur.copy_expert("""
-                COPY yazejibi6672_analytics.best_performing_product TO STDIN WITH (FORMAT CSV, HEADER, DELIMITER ',')
+                COPY yazejibi2622_analytics.best_performing_product TO STDIN WITH (FORMAT CSV, HEADER, DELIMITER ',')
                 """, file)
-            resource.Object(bucket, 'analytics_export/yazejibi6672/best_performing_product.csv').put(Body=file.getvalue())
+            resource.Object(BUCKET, 'analytics_export/yazejibi2622/best_performing_product.csv').put(Body=file.getvalue())
 
             print("File best_performing_product.csv exported successfully!")
         except Exception as e:

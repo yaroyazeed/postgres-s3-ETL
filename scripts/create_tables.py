@@ -5,19 +5,19 @@ import os
 from botocore import UNSIGNED
 from botocore.client import Config
 
-ENDPOINT="d2b-internal-assessment-dwh.cxeuj0ektqdz.eu-central-1.rds.amazonaws.com"
+HOST="34.89.230.185"
 PORT="5432"
-USER="yazejibi6672"
+USER="yazejibi2622"
 REGION="eu-central-1"
-DBNAME="d2b_assessment"
-PASSWORD="3aXYi4XPVw"
+DBNAME="d2b_accessment"
+PASSWORD="wUrwdz3sDa"
 
 try:
-    conn = psycopg2.connect(host=ENDPOINT, port=PORT, database=DBNAME, user=USER, password=PASSWORD, sslrootcert="SSLCERTIFICATE")
+    conn = psycopg2.connect(host=HOST, port=PORT, database=DBNAME, user=USER, password=PASSWORD, sslrootcert="SSLCERTIFICATE")
     cur = conn.cursor()
     #Create Tables
     cur.execute("""
-        CREATE TABLE yazejibi6672_staging.orders
+        CREATE TABLE yazejibi2622_staging.orders
         (order_id INT PRIMARY KEY NOT NULL,
              customer_id     INT         NOT NULL,
              order_date      DATE        NOT NULL,
@@ -33,7 +33,7 @@ try:
     conn.commit()
 
     cur.execute("""
-        CREATE TABLE yazejibi6672_staging.reviews
+        CREATE TABLE yazejibi2622_staging.reviews
         (review INT NOT NULL,
             product_id     INT         NOT NULL
              );
@@ -42,7 +42,7 @@ try:
     conn.commit()
 
     cur.execute("""
-        CREATE TABLE yazejibi6672_staging.shipments_deliveries
+        CREATE TABLE yazejibi2622_staging.shipments_deliveries
         (shipment_id        INT    PRIMARY KEY     NOT NULL,
             order_id        INT                    NOT NULL,
             shipment_date   DATE                   NULL,
